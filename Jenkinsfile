@@ -7,6 +7,8 @@ pipeline {
         APPLICATION_SOURCE_URL = 'https://github.com/freddieentity/nginx-service.git'
         APPLICATION_NAME = "nginx-service"
         CONTAINER_BUILD_CONTEXT = "."
+        CONTAINER_REGISTRY_USER    = credentials('CONTAINER_REGISTRY_USER')
+        CONTAINER_REGISTRY_PASSWORD    = credentials('CONTAINER_REGISTRY_PASSWORD')
     }
     stages {
         stage('UnitTest') {
@@ -17,9 +19,9 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh "echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin"
-                sh "docker build -t ${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/${APPLICATION_NAME}:dev ${CONTAINER_BUILD_CONTEXT}"
-                sh "docker push ${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/${APPLICATION_NAME}:dev"
+                sh "echo $CONTAINER_REGISTRY_PASSWORD | docker login -u ${CONTAINER_REGISTRY_USER} --password-stdin"
+                sh "docker build -t ${CONTAINER_REPOSITORY}/${APPLICATION_NAME}:dev ${CONTAINER_BUILD_CONTEXT}"
+                sh "docker push ${CONTAINER_REPOSITORY}/${APPLICATION_NAME}:dev"
             }
         }
         stage('Deploy') { 
